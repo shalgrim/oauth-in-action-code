@@ -93,7 +93,7 @@ app.get("/callback", function(req, res) {
     "Content-Type": "application/x-www-form-urlencoded",
     Authorization:
       "Basic " + encodeClientCredentials(client.client_id, client.client_secret)
-  };
+  }; // wait, why is the key sometimes a string and sometimes not?
 
   var tokRes = request("POST", authServer.tokenEndpoint, {
     body: form_data,
@@ -106,7 +106,7 @@ app.get("/callback", function(req, res) {
     var body = JSON.parse(tokRes.getBody());
     access_token = body.access_token;
     console.log("Got access token: %s", access_token);
-    res.render("index", { access_token: access_token, scope: scope });  // where does scope get defined? It's null on line 39
+    res.render("index", { access_token: access_token, scope: scope }); // where does scope get defined? It's null on line 39
   } else {
     res.render("error", {
       error:
@@ -119,6 +119,26 @@ app.get("/fetch_resource", function(req, res) {
   /*
    * Use the access token to call the resource server
    */
+  if (!access_token) {
+    res.render("error", { error: "Missing access token." });
+    return;
+  }
+
+  console.log('Making request with access token %s', access_token);
+
+  var headers = {
+    Authorization: "Bearer " + access_token
+  };
+  var resource = request('POST', protectedResource, {headers: headers});
+
+  if (resource.statusCode >= 200 && resource.statusCode < 300) {
+    var body = JSON.parse(resource.getBody());
+    res.render('data', {resource: body});
+    return;
+  } else {
+    res.render('error', {error: 'Server returned response code: ' + resource.statusCode});
+    return;
+  }
 });
 
 var buildUrl = function(base, options, hash) {
