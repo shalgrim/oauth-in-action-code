@@ -122,6 +122,7 @@ app.post('/approve', function(req, res) {
 			delete urlParsed.search; // this is a weird behavior of the URL library
 			urlParsed.query = urlParsed.query || {};
 			urlParsed.query.code = code;
+			console.log('query.state: %s', query.state);
 			urlParsed.query.state = query.state; 
 			res.redirect(url.format(urlParsed));
 			return;
