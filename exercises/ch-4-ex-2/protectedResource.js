@@ -64,7 +64,7 @@ app.get('/words', getAccessToken, requireAccessToken, function(req, res) {
 	/*
 	 * Make this function require the "read" scope
 	 */
-	res.json({words: savedWords.join(' '), timestamp: Date.now()});
+	res.json({words: savedWords.join(' '), timestamp: Date.now()});  // why no `.end()` here?
 });
 
 app.post('/words', getAccessToken, requireAccessToken, function(req, res) {
