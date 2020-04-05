@@ -55,10 +55,37 @@ app.get('/authorize', function(req, res) {
 });
 
 app.post('/username_password', function(req, res) {
+	var username = req.body.username;
+	var password = req.body.password;
 
-	/*
-	 * Implement the resource owner grant type here
-	 */
+	var form_data = qs.stringify({
+		grant_type: 'password',
+		username: username,
+		password: password,
+		scope: client.scope
+	});
+
+	var headers = {
+		'Content-Type': 'application/x-www-form-urlencoded',
+		'Authorization': 'Basic ' + encodeClientCredentials(client.client_id, client.client_secret)
+	}
+
+	var tokRes = request('POST', authServer.tokenEndpoint, {
+		body: form_data,
+		headers: headers
+	});
+
+	if (tokRes.statusCode >= 200 && tokRes.statusCode < 300) {
+		var body = JSON.parse(tokRes.getBody());
+		access_token = body.access_token;
+		scope = body.scope;
+
+		// I think they forgot to parse out the refresh_token
+		res.render('index', {access_token: access_token, refresh_token: refresh_token, scope: scope});
+	} else {
+		res.render('error', {error: 'Unable to fetch access token, server response: ' + tokRes.statusCode});
+	}
+	
 
 });
 

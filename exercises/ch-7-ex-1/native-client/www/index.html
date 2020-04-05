@@ -58,7 +58,8 @@
       // authorization server information
       var authServer = {
         authorizationEndpoint: 'http://localhost:9001/authorize',
-        tokenEndpoint: 'http://localhost:9001/token'
+        tokenEndpoint: 'http://localhost:9001/token',
+        registrationEndpoint: 'http://localhost:9001/register'
       };
 
       var protectedResource = 'http://localhost:9002/resource';
@@ -76,6 +77,21 @@
       }  
 
       function handleAuthorizationRequestClick(ev) {
+        if (!client.client_id) {
+          $.ajax({
+            url: authServer.registrationEndpoint,
+            type: 'POST',
+            data: client,
+            crossDomain: true,
+            dataType: 'json'
+          }).done(function(data) {
+            client.client_id = data.client_id;
+            client.client_secret = data.clinet_secret;
+
+          }).fail(function() {
+            $('.oauth-protected-resource').text('Error while fetching registration endpoint');
+          });
+        }
         var state = generateState(32);
 
         localStorage.setItem('oauth-state', state);
