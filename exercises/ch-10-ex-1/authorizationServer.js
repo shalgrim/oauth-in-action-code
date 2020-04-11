@@ -184,11 +184,21 @@ app.post("/token", function(req, res){
 		if (code) {
 			delete codes[req.body.code]; // burn our code, it's been used
 			if (code.request.client_id == clientId) {
+				if (code.request.code_challenge) {
+					if (code.request.code_challenge_method == 'plain') {
+						var code_challenge = req.body.code_verifier;
+					} else if (code.request.code_challenge_method == 'S256') {
+						var code_challenge = base64url.fromBase64(crypto.createHash('sha256').update(req.body.code_verifier).digest('base64'));
+					} else {
+						res.status(400).json({error: 'invalid_request'});
+						return;
+					}
 
-				/*
-				 * Add code to check PKCE values here
-				 */
-
+					if (code.request.code_challenge != code_challenge) {
+						res.status(400).json({error: 'invalid_request'});
+						return;
+					}
+				}
 				var access_token = randomstring.generate();
 				var refresh_token = randomstring.generate();
 
