@@ -24,7 +24,7 @@ var resource = {
 	"description": "This data has been protected by OAuth 2.0"
 };
 
-var protectedResources = {
+var protectedResource = {
 		"resource_id": "protected-resource-1",
 		"resource_secret": "protected-resource-secret-1"
 };
@@ -52,7 +52,29 @@ var getAccessToken = function(req, res, next) {
 	/*
 	 * Send the incoming token to the introspection endpoint and parse the results
 	 */
+	var form_data = qs.stringify({
+		token: inToken
+	});
 
+	var headers = {
+		'Content-Type': 'applicatoin/x-www-form-urlencoded',
+		'Authorization': 'Basic ' + encodeClientCredentials(protectedResource.resource_id, protectedResource.resource_secret)
+	};
+
+	var tokRes = request('POST', authServer.introspectionEndpoint, {
+		body: form_data,
+		headers: headres
+	});
+
+	if (tokeRes.statusCode >= 200 && tokRes.statusCode < 300) {
+		var body = JSON.parse(tokRes.getBody());
+		console.log('Got introspection response', body);
+		
+		var active = body.active;
+		if (active) {
+			req.access_token = body;
+		}
+	}
 
 	next();
 	return;
