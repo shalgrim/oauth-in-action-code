@@ -318,8 +318,7 @@ var checkClientMetadata = function(req, res) {
 	if (__.contains(['client_secret_basic', 'client_secret_post']), reg.token_endpoint_auth_method) {
 		reg.client_secret = randomstring.generate();
 	}
-	
-	return reg;
+
 };
 
 app.post('/register', function (req, res){
@@ -371,6 +370,7 @@ var authorizeConfigurationEndpointRequest = function (req, res, next) {
 
 app.get('/register/:clientId', authorizeConfigurationEndpointRequest, function(req, res) {
 	res.status(200).json(client);
+	return;
 });
 
 app.put('/register/:clientId', authorizeConfigurationEndpointRequest, function(req, res) {
@@ -397,7 +397,7 @@ app.put('/register/:clientId', authorizeConfigurationEndpointRequest, function(r
 	});
 
 	res.status(200).json(client);
-	
+	return;
 });
 
 app.delete('/register/:clientId', authorizeConfigurationEndpointRequest, function(req, res) {
@@ -413,8 +413,6 @@ app.delete('/register/:clientId', authorizeConfigurationEndpointRequest, functio
 	
 	res.status(204).end();
 	return;
-
-	
 });
 
 var buildUrl = function(base, options, hash) {

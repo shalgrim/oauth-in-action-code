@@ -291,6 +291,9 @@ var checkClientMetadata = function(req, res) {
 		return;
 	}
 
+	console.log('hello');
+	console.log(req.body);
+
 	if (!req.body.redirect_uris || !__.isArray(req.body.redirect_uris) || __.isEmpty(req.body.redirect_uris)) {
 		res.status(400).json({error: 'invalid_redirect_uri'});
 		return;

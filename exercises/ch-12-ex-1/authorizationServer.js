@@ -275,6 +275,8 @@ app.post("/register", function (req, res) {
    * Implement the registration endpoint
    */
   var reg = {};
+  console.log("registering");
+  console.log(req);
 
   if (!req.body.token_endpoint_auth_method) {
     reg.token_endpoint_auth_method = "secret_basic";
@@ -291,6 +293,8 @@ app.post("/register", function (req, res) {
     res.status(400).json({ error: "invalid_client_metadata" });
     return;
   }
+
+  console.log("past first return");
 
   if (!req.body.grant_types) {
     if (!req.body.response_types) {
@@ -344,16 +348,23 @@ app.post("/register", function (req, res) {
     return;
   }
 
+  console.log("past second return");
+
   if (
     !req.body.redirect_uris ||
     !__.isArray(req.body.redirect_uris) ||
     __.isEmpty(req.body.redirect_uris)
   ) {
+    console.log("hitting third return");
+    console.log(req.body.redirect_uris);
+    console.log(req.body);
     res.status(400).json({ error: "invalid_redirect_uri" });
     return;
   } else {
     reg.redirect_uris = req.body.redirect_uris;
   }
+
+  console.log("past third return");
 
   if (typeof req.body.client_name == "string") {
     reg.client_name = req.body.client_name;
